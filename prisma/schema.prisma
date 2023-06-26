@@ -31,17 +31,6 @@ model Categories {
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model Fines {
-  RecordID   Int       @id
-  ReaderID   Int?
-  FineAmount Decimal?  @db.Decimal(10, 2)
-  FineDate   DateTime? @db.Date
-  Readers    Readers?  @relation(fields: [ReaderID], references: [ReaderID], onDelete: NoAction, onUpdate: NoAction, map: "Fines_ibfk_1")
-
-  @@index([ReaderID], map: "ReaderID")
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model Notices {
   NoticeID    Int       @id
   Title       String?   @db.VarChar(100)
@@ -55,12 +44,11 @@ model Readers {
   Name               String? @db.VarChar(100)
   ContactInformation String? @db.VarChar(255)
   Password           String? @db.VarChar(255)
-  Fines              Fines[]
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model Users {
-  UserID   Int     @id
+  UserID   Int     @id @default(autoincrement())
   Username String? @db.VarChar(100)
   Password String? @db.VarChar(255)
   UserType String? @db.VarChar(50)
