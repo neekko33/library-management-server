@@ -1,5 +1,5 @@
 import {FastifyInstance} from 'fastify'
-import {addBookHandler, deleteBookHandler, updateBookHandler, getBooksHandler} from './book.controller'
+import {addBookHandler, deleteBookHandler, updateBookHandler, getBooksHandler} from './books.controller'
 
 async function bookRoutes(server: FastifyInstance) {
   server.post('/', {

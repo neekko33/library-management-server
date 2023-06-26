@@ -9,36 +9,18 @@ datasource db {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model Books {
-  BookID             Int            @id
-  Title              String?        @db.VarChar(255)
-  Author             String?        @db.VarChar(50)
-  PublicationDate    DateTime?      @db.Date
-  PublishingHouse    String?        @db.VarChar(50)
-  ISBN               String?        @db.VarChar(255)
-  Price              String?        @db.VarChar(50)
+  BookID             Int       @id @default(autoincrement())
+  Title              String?   @db.VarChar(255)
+  Author             String?   @db.VarChar(50)
+  PublicationDate    DateTime? @db.Date
+  PublishingHouse    String?   @db.VarChar(50)
+  ISBN               String?   @db.VarChar(255)
+  Price              String?   @db.VarChar(50)
   CategoryID         Int?
-  AvailabilityStatus String?        @db.VarChar(50)
-  Location           String?        @db.VarChar(100)
-  ImgUrl             String?        @db.VarChar(255)
-  Introduction       String?        @db.VarChar(255)
-  Borrowings         Borrowings[]
-  Reservations       Reservations[]
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model Borrowings {
-  RecordID      Int       @id @default(autoincrement())
-  BookID        Int?
-  ReaderID      Int?
-  BorrowingDate DateTime? @db.Date
-  DueDate       DateTime? @db.Date
-  ReturnDate    DateTime? @db.Date
-  OverdueStatus Boolean?
-  Books         Books?    @relation(fields: [BookID], references: [BookID], onDelete: NoAction, onUpdate: NoAction, map: "Borrowings_ibfk_1")
-  Readers       Readers?  @relation(fields: [ReaderID], references: [ReaderID], onDelete: NoAction, onUpdate: NoAction, map: "Borrowings_ibfk_2")
-
-  @@index([BookID], map: "BookID")
-  @@index([ReaderID], map: "ReaderID")
+  AvailabilityStatus String?   @db.VarChar(50)
+  Location           String?   @db.VarChar(100)
+  ImgUrl             String?   @db.VarChar(255)
+  Introduction       String?   @db.VarChar(255)
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -69,27 +51,11 @@ model Notices {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model Readers {
-  ReaderID           Int            @id
-  Name               String?        @db.VarChar(100)
-  ContactInformation String?        @db.VarChar(255)
-  Password           String?        @db.VarChar(255)
-  Borrowings         Borrowings[]
+  ReaderID           Int     @id
+  Name               String? @db.VarChar(100)
+  ContactInformation String? @db.VarChar(255)
+  Password           String? @db.VarChar(255)
   Fines              Fines[]
-  Reservations       Reservations[]
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model Reservations {
-  RecordID        Int       @id
-  BookID          Int?
-  ReaderID        Int?
-  ReservationDate DateTime? @db.Date
-  PickupStatus    Boolean?
-  Books           Books?    @relation(fields: [BookID], references: [BookID], onDelete: NoAction, onUpdate: NoAction, map: "Reservations_ibfk_1")
-  Readers         Readers?  @relation(fields: [ReaderID], references: [ReaderID], onDelete: NoAction, onUpdate: NoAction, map: "Reservations_ibfk_2")
-
-  @@index([BookID], map: "BookID")
-  @@index([ReaderID], map: "ReaderID")
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
