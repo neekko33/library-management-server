@@ -9,7 +9,6 @@ type BookRequest = FastifyRequest<{
     page?: number
   },
   Body: {
-    bookId?: number,
     title: string,
     author: string,
     publicationDate: Date,
@@ -40,7 +39,6 @@ export async function getBooksHandler(request: BookRequest, reply: FastifyReply)
 
 export async function addBookHandler(request: BookRequest, reply: FastifyReply) {
   const {
-    bookId,
     title,
     author,
     publicationDate,
@@ -53,12 +51,9 @@ export async function addBookHandler(request: BookRequest, reply: FastifyReply) 
     imgUrl,
     introduction
   } = request.body
-  // try better way
-  if (!bookId) return
   const publicationDateTime = new Date(publicationDate)
   await prisma.books.create({
     data: {
-      BookID: bookId,
       Title: title,
       Author: author,
       PublicationDate: publicationDateTime,
