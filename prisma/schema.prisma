@@ -32,7 +32,7 @@ model Categories {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model Notices {
-  NoticeID    Int       @id
+  NoticeID    Int       @id @default(autoincrement())
   Title       String?   @db.VarChar(100)
   Content     String?   @db.Text
   PublishDate DateTime? @db.Date

@@ -5,6 +5,7 @@ import bookRoutes from './modules/books/books.route'
 import categoryRoutes from './modules/categories/categories.route'
 import userRoutes from './modules/users/users.route'
 import readerRoutes from './modules/readers/readers.route'
+import noticeRoutes from './modules/notices/notices.route'
 
 const server: FastifyInstance = Fastify({})
 
@@ -35,6 +36,7 @@ server.register(bookRoutes, {prefix: 'api/books'})
 server.register(categoryRoutes, {prefix: 'api/categories'})
 server.register(userRoutes, {prefix: 'api/users'})
 server.register(readerRoutes, {prefix: 'api/readers'})
+server.register(noticeRoutes, {prefix: 'api/notices'})
 
 const start = async () => {
   try {
