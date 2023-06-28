@@ -12,15 +12,14 @@ const server: FastifyInstance = Fastify({})
 const swaggerOptions = {
   swagger: {
     info: {
-      title: 'My Title',
+      title: 'Library Management System',
       description: 'My Description.',
       version: '1.0.0',
     },
-    host: 'localhost',
-    schemes: ['http', 'https'],
+    host: 'localhost:3000',
+    schemes: ['http'],
     consumes: ['application/json'],
     produces: ['application/json'],
-    tags: [{name: 'Default', description: 'Default'}],
   }
 }
 

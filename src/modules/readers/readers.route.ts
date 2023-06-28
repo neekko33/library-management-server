@@ -4,6 +4,7 @@ import {addReaderHandler, deleteReaderHandler, updateReaderHandler, getReaderHan
 async function readerRoutes(server: FastifyInstance) {
   server.post('/', {
     schema: {
+      tags: ['Reader'],
       body: {
         type: 'object',
         properties: {
@@ -18,6 +19,7 @@ async function readerRoutes(server: FastifyInstance) {
 
   server.delete('/:rId', {
     schema: {
+      tags: ['Reader'],
       params: {
         type: 'object',
         properties: {
@@ -29,6 +31,7 @@ async function readerRoutes(server: FastifyInstance) {
 
   server.put('/:rId', {
     schema: {
+      tags: ['Reader'],
       params: {
         type: 'object',
         properties: {
@@ -49,6 +52,7 @@ async function readerRoutes(server: FastifyInstance) {
 
   server.get('/', {
     schema: {
+      tags: ['Reader'],
       querystring: {
         type: 'object',
         properties: {

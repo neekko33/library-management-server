@@ -4,6 +4,7 @@ import {addNoticeHandler, deleteNoticeHandler, updateNoticeHandler, getNoticeHan
 async function noticeRoutes(server: FastifyInstance) {
   server.post('/', {
     schema: {
+      tags: ['Notice'],
       body: {
         type: 'object',
         properties: {
@@ -18,6 +19,7 @@ async function noticeRoutes(server: FastifyInstance) {
 
   server.delete('/:nId', {
     schema: {
+      tags: ['Notice'],
       params: {
         type: 'object',
         properties: {
@@ -29,6 +31,7 @@ async function noticeRoutes(server: FastifyInstance) {
 
   server.put('/:nId', {
     schema: {
+      tags: ['Notice'],
       params: {
         type: 'object',
         properties: {
@@ -49,6 +52,7 @@ async function noticeRoutes(server: FastifyInstance) {
 
   server.get('/', {
     schema: {
+      tags: ['Notice'],
       querystring: {
         type: 'object',
         properties: {

@@ -9,6 +9,7 @@ import {
 async function categoryRoutes(server: FastifyInstance) {
   server.post('/', {
     schema: {
+      tags: ['Category'],
       body: {
         type: 'object',
         properties: {
@@ -22,6 +23,7 @@ async function categoryRoutes(server: FastifyInstance) {
 
   server.delete('/:cId', {
     schema: {
+      tags: ['Category'],
       params: {
         type: 'object',
         properties: {
@@ -34,6 +36,7 @@ async function categoryRoutes(server: FastifyInstance) {
 
   server.put('/:cId', {
     schema: {
+      tags: ['Category'],
       params: {
         type: 'object',
         properties: {
@@ -54,6 +57,7 @@ async function categoryRoutes(server: FastifyInstance) {
 
   server.get('/', {
     schema: {
+      tags: ['Category'],
       querystring: {
         type: 'object',
         properties: {

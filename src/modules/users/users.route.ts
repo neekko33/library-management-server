@@ -9,6 +9,7 @@ import {
 async function userRoutes(server: FastifyInstance) {
   server.post('/', {
     schema: {
+      tags: ['User'],
       body: {
         type: 'object',
         properties: {
@@ -23,6 +24,7 @@ async function userRoutes(server: FastifyInstance) {
 
   server.delete('/:uId', {
     schema: {
+      tags: ['User'],
       params: {
         type: 'object',
         properties: {
@@ -35,6 +37,7 @@ async function userRoutes(server: FastifyInstance) {
 
   server.put('/:uId', {
     schema: {
+      tags: ['User'],
       params: {
         type: 'object',
         properties: {
@@ -56,6 +59,7 @@ async function userRoutes(server: FastifyInstance) {
 
   server.get('/', {
     schema: {
+      tags: ['User'],
       querystring: {
         type: 'object',
         properties: {

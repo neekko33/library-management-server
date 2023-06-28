@@ -4,6 +4,7 @@ import {addBookHandler, deleteBookHandler, updateBookHandler, getBooksHandler} f
 async function bookRoutes(server: FastifyInstance) {
   server.post('/', {
     schema: {
+      tags: ['Book'],
       body: {
         type: 'object',
         properties: {
@@ -40,6 +41,7 @@ async function bookRoutes(server: FastifyInstance) {
 
   server.delete('/:bookId', {
     schema: {
+      tags: ['Book'],
       params: {
         type: 'object',
         properties: {
@@ -51,6 +53,7 @@ async function bookRoutes(server: FastifyInstance) {
 
   server.put('/:bookId', {
     schema: {
+      tags: ['Book'],
       params: {
         type: 'object',
         properties: {
@@ -79,6 +82,7 @@ async function bookRoutes(server: FastifyInstance) {
 
   server.get('/', {
     schema: {
+      tags: ['Book'],
       querystring: {
         type: 'object',
         properties: {
