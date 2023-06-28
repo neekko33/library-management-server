@@ -5,16 +5,24 @@ type CategoryRequest = FastifyRequest<{
   Params: {
     cId?: number
   },
+  Querystring: {
+    page?: number
+  },
   Body: {
     categoryName: string,
     categoryChar: string
   }
 }>
 
-export async function getCategoriesHandler(request: FastifyRequest, reply: FastifyReply) {
+export async function getCategoriesHandler(request: CategoryRequest, reply: FastifyReply) {
   try {
+    const total = await prisma.categories.count()
+    let {page} = request.query
+    if (!page) page = 1
     const categories = await prisma.categories.findMany()
     reply.code(200).send({
+      total,
+      page,
       data: categories
     })
   } catch (e) {

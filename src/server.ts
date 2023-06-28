@@ -4,6 +4,7 @@ import fastifySwaggerUi from '@fastify/swagger-ui'
 import bookRoutes from './modules/books/books.route'
 import categoryRoutes from './modules/categories/categories.route'
 import userRoutes from './modules/users/users.route'
+import readerRoutes from './modules/readers/readers.route'
 
 const server: FastifyInstance = Fastify({})
 
@@ -33,6 +34,7 @@ server.register(fastifySwaggerUi, swaggerUiOptions)
 server.register(bookRoutes, {prefix: 'api/books'})
 server.register(categoryRoutes, {prefix: 'api/categories'})
 server.register(userRoutes, {prefix: 'api/users'})
+server.register(readerRoutes, {prefix: 'api/readers'})
 
 const start = async () => {
   try {

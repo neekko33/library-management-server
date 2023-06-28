@@ -5,6 +5,9 @@ type UserRequest = FastifyRequest<{
   Params: {
     uId?: number
   },
+  Querystring: {
+    page?: number
+  },
   Body: {
     username: string,
     password: string
@@ -12,10 +15,15 @@ type UserRequest = FastifyRequest<{
   }
 }>
 
-export async function getUserHandler(request: FastifyRequest, reply: FastifyReply) {
+export async function getUserHandler(request: UserRequest, reply: FastifyReply) {
   try {
+    const total = await prisma.users.count()
+    let {page} = request.query
+    if (!page) page = 1
     const categories = await prisma.users.findMany()
     reply.code(200).send({
+      total,
+      page,
       data: categories
     })
   } catch (e) {

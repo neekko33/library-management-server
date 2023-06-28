@@ -54,7 +54,16 @@ async function userRoutes(server: FastifyInstance) {
     }
   }, updateUserHandler)
 
-  server.get('/', getUserHandler)
+  server.get('/', {
+    schema: {
+      querystring: {
+        type: 'object',
+        properties: {
+          page: {type: 'number'},
+        },
+      }
+    },
+  }, getUserHandler)
 }
 
 export default userRoutes

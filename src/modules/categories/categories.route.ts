@@ -52,7 +52,16 @@ async function categoryRoutes(server: FastifyInstance) {
     }
   }, updateCategoryHandler)
 
-  server.get('/', getCategoriesHandler)
+  server.get('/', {
+    schema: {
+      querystring: {
+        type: 'object',
+        properties: {
+          page: {type: 'number'},
+        },
+      }
+    },
+  }, getCategoriesHandler)
 }
 
 export default categoryRoutes
