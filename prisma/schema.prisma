@@ -9,18 +9,22 @@ datasource db {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model Books {
-  BookID             Int       @id @default(autoincrement())
-  Title              String?   @db.VarChar(255)
-  Author             String?   @db.VarChar(50)
-  PublicationDate    DateTime? @db.Date
-  PublishingHouse    String?   @db.VarChar(50)
-  ISBN               String?   @db.VarChar(255)
-  Price              String?   @db.VarChar(50)
-  CategoryID         Int?
-  AvailabilityStatus String?   @db.VarChar(50)
-  Location           String?   @db.VarChar(100)
-  ImgUrl             String?   @db.VarChar(255)
-  Introduction       String?   @db.VarChar(255)
+  BookID             Int        @id @default(autoincrement())
+  Title              String?    @db.VarChar(255)
+  Author             String?    @db.VarChar(50)
+  PublicationDate    DateTime?  @db.Date
+  PublishingHouse    String?    @db.VarChar(50)
+  ISBN               String?    @db.VarChar(255)
+  Price              String?    @db.VarChar(50)
+  CategoryID         Int
+  AvailabilityStatus String?    @db.VarChar(50)
+  Location           String?    @db.VarChar(100)
+  ImgUrl             String?    @db.VarChar(255)
+  Introduction       String?    @db.VarChar(255)
+  Categories         Categories @relation(fields: [CategoryID], references: [CategoryID], onDelete: NoAction, onUpdate: NoAction, map: "Books_ibfk_1")
+  Borrows            Borrows[]
+
+  @@index([CategoryID], map: "CategoryID")
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -28,22 +32,26 @@ model Categories {
   CategoryID   Int     @id @default(autoincrement())
   CategoryName String  @db.VarChar(100)
   CategoryChar String? @db.Char(1)
+  Books        Books[]
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model Notices {
-  NoticeID    Int       @id @default(autoincrement())
-  Title       String?   @db.VarChar(100)
-  Content     String?   @db.Text
-  PublishDate DateTime? @db.Date
+  NoticeID     Int      @id @default(autoincrement())
+  Title        String   @db.VarChar(100)
+  Content      String   @db.Text
+  CreationDate DateTime @db.Date
+  UserID       Int
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model Readers {
-  ReaderID           Int     @id @default(autoincrement())
-  Name               String? @db.VarChar(100)
-  ContactInformation String? @db.VarChar(255)
-  Password           String? @db.VarChar(255)
+  ReaderID Int       @id @default(autoincrement())
+  Name     String?   @db.VarChar(100)
+  Phone    String?   @db.VarChar(11)
+  Password String?   @db.VarChar(255)
+  Email    String?   @db.VarChar(255)
+  Borrows  Borrows[]
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -52,4 +60,29 @@ model Users {
   Username String? @db.VarChar(100)
   Password String? @db.VarChar(255)
   UserType String? @db.VarChar(50)
+}
+
+model Borrows {
+  BorrowID   Int       @id @default(autoincrement())
+  BookID     Int?
+  ReaderID   Int?
+  BorrowDate DateTime? @db.Date
+  ReturnDate DateTime? @db.Date
+  IsOverdue  Boolean?
+  Books      Books?    @relation(fields: [BookID], references: [BookID], onDelete: NoAction, onUpdate: NoAction, map: "Borrows_ibfk_1")
+  Readers    Readers?  @relation(fields: [ReaderID], references: [ReaderID], onDelete: NoAction, onUpdate: NoAction, map: "Borrows_ibfk_2")
+  Fines      Fines[]
+
+  @@index([BookID], map: "BookID")
+  @@index([ReaderID], map: "ReaderID")
+}
+
+model Fines {
+  FineID     Int      @id @default(autoincrement())
+  BorrowID   Int?
+  FineAmount Decimal? @db.Decimal(10, 2)
+  IsPaid     Boolean?
+  Borrows    Borrows? @relation(fields: [BorrowID], references: [BorrowID], onDelete: NoAction, onUpdate: NoAction, map: "Fines_ibfk_1")
+
+  @@index([BorrowID], map: "BorrowID")
 }
