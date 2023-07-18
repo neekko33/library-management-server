@@ -7,6 +7,7 @@ import userRoutes from './modules/users/users.route'
 import readerRoutes from './modules/readers/readers.route'
 import noticeRoutes from './modules/notices/notices.route'
 import borrowRoutes from './modules/borrows/borrows.route'
+import fineRoutes from './modules/fines/fines.route'
 import { checkOverdueAll } from './modules/borrows/borrows.controller'
 
 const server: FastifyInstance = Fastify({})
@@ -39,6 +40,7 @@ server.register(userRoutes, { prefix: 'api/users' })
 server.register(readerRoutes, { prefix: 'api/readers' })
 server.register(noticeRoutes, { prefix: 'api/notices' })
 server.register(borrowRoutes, { prefix: 'api/borrows' })
+server.register(fineRoutes, { prefix: '/api/fines' })
 
 const start = async () => {
 	try {

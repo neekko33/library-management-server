@@ -13,6 +13,24 @@ type FineRequest = FastifyRequest<{
 	}
 }>
 
+export async function getFineByBorrowIdHandler(
+	request: FineRequest,
+	reply: FastifyReply
+) {
+	try {
+		const fine = await prisma.fines.findFirst({
+			where: {
+				BorrowID: request.body.borrowId,
+			},
+		})
+		reply.code(200).send({
+			data: fine,
+		})
+	} catch (e) {
+		reply.code(500).send({ msg: e })
+	}
+}
+
 export async function payFineHandler(
 	request: FineRequest,
 	reply: FastifyReply
