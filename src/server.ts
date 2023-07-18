@@ -44,7 +44,7 @@ server.register(fineRoutes, { prefix: '/api/fines' })
 
 const start = async () => {
 	try {
-		await server.listen({ port: 3000 })
+		await server.listen({ port: 7001 })
 	} catch (e) {
 		server.log.error(e)
 		process.exit(1)

@@ -15,6 +15,30 @@ type UserRequest = FastifyRequest<{
 	}
 }>
 
+export async function loginHandler(request: UserRequest, reply: FastifyReply) {
+	try {
+		const { username, password } = request.body
+		const user = await prisma.users.findFirst({
+			where: {
+				Username: username,
+				Password: password,
+			},
+		})
+		if (user) {
+			reply.code(200).send({
+				msg: '登录成功',
+				userId: user.UserID,
+				username: user.Username,
+				userType: user.UserType,
+			})
+		} else {
+			reply.code(500).send({ mgs: '用户名或密码错误' })
+		}
+	} catch (e) {
+		reply.code(500).send({ mgs: e })
+	}
+}
+
 export async function getUserHandler(
 	request: UserRequest,
 	reply: FastifyReply
