@@ -7,6 +7,7 @@ import userRoutes from './modules/users/users.route'
 import readerRoutes from './modules/readers/readers.route'
 import noticeRoutes from './modules/notices/notices.route'
 import borrowRoutes from './modules/borrows/borrows.route'
+import { checkOverdueAll } from './modules/borrows/borrows.controller'
 
 const server: FastifyInstance = Fastify({})
 
@@ -47,5 +48,7 @@ const start = async () => {
 		process.exit(1)
 	}
 }
+
+checkOverdueAll()
 
 start()

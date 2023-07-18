@@ -1,4 +1,3 @@
-import { read } from 'fs'
 import prisma from '../../utils/prisma'
 import { FastifyReply, FastifyRequest } from 'fastify'
 
@@ -81,16 +80,12 @@ export async function addBorrowHandler(
 	const { bookId, readerId } = request.body
 	await checkOverdueByReaderId(readerId, reply)
 	const borrowDate = new Date()
-	const dateNow = new Date()
-	dateNow.setDate(dateNow.getDate() + 30)
-	const returnDate = dateNow
 	try {
 		await prisma.borrows.create({
 			data: {
 				BookID: bookId,
 				ReaderID: readerId,
 				BorrowDate: borrowDate,
-				ReturnDate: returnDate,
 				IsOverdue: false,
 			},
 		})
@@ -108,10 +103,14 @@ export async function deleteBorrowHandler(
 	if (!bId) reply.code(500).send({ msg: 'need borrow id.' })
 	const { readerId } = request.body
 	await checkOverdueByReaderId(readerId, reply)
+	const returnDate = new Date()
 	try {
-		await prisma.borrows.delete({
+		await prisma.borrows.update({
 			where: {
 				BorrowID: bId,
+			},
+			data: {
+				ReturnDate: returnDate,
 			},
 		})
 		reply.code(200).send({ msg: 'success' })
@@ -129,17 +128,14 @@ export async function renewBorrowHandler(
 	if (!bId) reply.code(500).send({ msg: 'need borrow id.' })
 	const { readerId } = request.body
 	await checkOverdueByReaderId(readerId, reply)
-	const dateNow = new Date()
-	const returnDate = new Date(
-		dateNow.setDate(dateNow.getDate() + 30).toLocaleString()
-	)
+	const borrowDate = new Date()
 	try {
 		await prisma.borrows.update({
 			where: {
 				BorrowID: bId,
 			},
 			data: {
-				ReturnDate: returnDate,
+				BorrowDate: borrowDate,
 			},
 		})
 		reply.code(200).send({ mgs: 'success' })
@@ -159,9 +155,9 @@ export async function checkOverdueAll() {
 		const overdueBorrowIds: number[] = []
 		borrows.map(item => {
 			const days =
-				(new Date().getTime() - item.ReturnDate.getTime()) /
+				(new Date().getTime() - item.BorrowDate.getTime()) /
 				(1000 * 60 * 60 * 24)
-			if (days >= 1) {
+			if (days >= 31) {
 				overdueBorrowIds.push(item.BorrowID)
 			}
 		})
@@ -175,7 +171,14 @@ export async function checkOverdueAll() {
 					IsOverdue: true,
 				},
 			})
-			// TODO:生成罚款记录
+			// 生成罚款记录
+			await prisma.fines.create({
+				data: {
+					BorrowID: item,
+					FineAmount: 5,
+					IsPaid: false,
+				},
+			})
 		})
 	} catch (e) {
 		console.log(e)

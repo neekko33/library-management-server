@@ -27,23 +27,23 @@ async function borrowRoutes(server: FastifyInstance) {
 	)
 
 	server.delete(
-		'/:borrowId',
+		'/:bId',
 		{
 			schema: {
 				tags: ['Borrow'],
 				params: {
 					type: 'object',
 					properties: {
-						borrowId: { type: 'number' },
+						bId: { type: 'number' },
 					},
-					required: ['borrowId'],
+					required: ['bId'],
 				},
 				body: {
 					type: 'object',
 					properties: {
 						readerId: { type: 'number' },
 					},
-					required: ['borrowId'],
+					required: ['readerId'],
 				},
 			},
 		},
@@ -67,14 +67,14 @@ async function borrowRoutes(server: FastifyInstance) {
 	)
 
 	server.get(
-		'/:readerId',
+		'/:rId',
 		{
 			schema: {
 				tags: ['Borrow'],
 				params: {
 					type: 'object',
 					properties: {
-						readerId: { type: 'number' },
+						rId: { type: 'number' },
 					},
 				},
 				querystring: {
@@ -89,16 +89,16 @@ async function borrowRoutes(server: FastifyInstance) {
 	)
 
 	server.put(
-		'/',
+		'/:bId',
 		{
 			schema: {
 				tags: ['Borrow'],
 				params: {
 					type: 'object',
 					properties: {
-						borrowId: { type: 'number' },
+						bId: { type: 'number' },
 					},
-					required: ['borrowId'],
+					required: ['bId'],
 				},
 				body: {
 					type: 'object',
