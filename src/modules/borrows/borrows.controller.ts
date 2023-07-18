@@ -5,6 +5,7 @@ import { FastifyReply, FastifyRequest } from 'fastify'
 type BorrowRequest = FastifyRequest<{
 	Params: {
 		bId?: number
+		rId?: number
 	}
 	Querystring: {
 		page?: number
@@ -49,17 +50,40 @@ export async function getBorrowsHandler(
 	}
 }
 
+export async function getBorrowsByReadIdHandler(
+	request: BorrowRequest,
+	reply: FastifyReply
+) {
+	try {
+		const { rId } = request.params
+		const total = await prisma.borrows.count({
+			where: {
+				ReaderID: rId,
+			},
+		})
+		let { page } = request.query
+		if (!page) page = 1
+		const borrows = await prisma.borrows.findMany()
+		reply.code(200).send({
+			total,
+			page,
+			data: borrows,
+		})
+	} catch (e) {
+		reply.code(500).send({ msg: e })
+	}
+}
+
 export async function addBorrowHandler(
 	request: BorrowRequest,
 	reply: FastifyReply
 ) {
 	const { bookId, readerId } = request.body
 	await checkOverdueByReaderId(readerId, reply)
+	const borrowDate = new Date()
 	const dateNow = new Date()
-	const borrowDate = new Date(dateNow.toLocaleDateString())
-	const returnDate = new Date(
-		dateNow.setDate(dateNow.getDate() + 30).toLocaleString()
-	)
+	dateNow.setDate(dateNow.getDate() + 30)
+	const returnDate = dateNow
 	try {
 		await prisma.borrows.create({
 			data: {
@@ -124,16 +148,20 @@ export async function renewBorrowHandler(
 	}
 }
 
-// TODO: 判断是否逾期
+// 判断是否逾期
 export async function checkOverdueAll() {
 	try {
-		const borrows = await prisma.borrows.findMany()
+		const borrows = await prisma.borrows.findMany({
+			where: {
+				IsOverdue: false,
+			},
+		})
 		const overdueBorrowIds: number[] = []
 		borrows.map(item => {
 			const days =
-				(item.ReturnDate.getTime() - item.BorrowDate.getTime()) /
+				(new Date().getTime() - item.ReturnDate.getTime()) /
 				(1000 * 60 * 60 * 24)
-			if (days > 30) {
+			if (days >= 1) {
 				overdueBorrowIds.push(item.BorrowID)
 			}
 		})
@@ -147,6 +175,7 @@ export async function checkOverdueAll() {
 					IsOverdue: true,
 				},
 			})
+			// TODO:生成罚款记录
 		})
 	} catch (e) {
 		console.log(e)

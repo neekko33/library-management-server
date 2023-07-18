@@ -31,7 +31,7 @@ const swaggerUiOptions = {
 
 server.register(fastifySwagger, swaggerOptions)
 server.register(fastifySwaggerUi, swaggerUiOptions)
-
+// TODO: 新增service层，提取controller中的数据库操作逻辑
 server.register(bookRoutes, { prefix: 'api/books' })
 server.register(categoryRoutes, { prefix: 'api/categories' })
 server.register(userRoutes, { prefix: 'api/users' })
