@@ -42,6 +42,9 @@ model Notices {
   Content      String   @db.Text
   CreationDate DateTime @db.Date
   UserID       Int
+  Users        Users    @relation(fields: [UserID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "Notices_ibfk_1")
+
+  @@index([UserID], map: "UserID")
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -56,10 +59,11 @@ model Readers {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model Users {
-  UserID   Int     @id @default(autoincrement())
-  Username String? @db.VarChar(100)
-  Password String? @db.VarChar(255)
-  UserType String? @db.VarChar(50)
+  UserID   Int       @id @default(autoincrement())
+  Username String?   @db.VarChar(100)
+  Password String?   @db.VarChar(255)
+  UserType String?   @db.VarChar(50)
+  Notices  Notices[]
 }
 
 model Borrows {

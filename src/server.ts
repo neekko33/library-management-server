@@ -1,4 +1,5 @@
 import Fastify, { FastifyInstance } from 'fastify'
+import cors from '@fastify/cors'
 import fastifySwagger from '@fastify/swagger'
 import fastifySwaggerUi from '@fastify/swagger-ui'
 import bookRoutes from './modules/books/books.route'
@@ -30,6 +31,8 @@ const swaggerUiOptions = {
 	routePrefix: '/docs',
 	exposeRoute: true,
 }
+
+server.register(cors)
 
 server.register(fastifySwagger, swaggerOptions)
 server.register(fastifySwaggerUi, swaggerUiOptions)

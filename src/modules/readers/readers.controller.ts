@@ -25,8 +25,8 @@ export async function getReaderHandler(
 		let { page } = request.query
 		if (!page) page = 1
 		const readers = await prisma.readers.findMany({
-			take: 10,
-			skip: (page - 1) * 10,
+			take: 13,
+			skip: (page - 1) * 13,
 		})
 		reply.code(200).send({
 			total,
