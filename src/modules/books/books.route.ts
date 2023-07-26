@@ -4,6 +4,7 @@ import {
 	deleteBookHandler,
 	updateBookHandler,
 	getBooksHandler,
+	searchBooksHandler,
 } from './books.controller'
 
 async function bookRoutes(server: FastifyInstance) {
@@ -111,6 +112,23 @@ async function bookRoutes(server: FastifyInstance) {
 			},
 		},
 		getBooksHandler
+	)
+
+	server.get(
+		'/search',
+		{
+			schema: {
+				tags: ['Book'],
+				querystring: {
+					type: 'object',
+					properties: {
+						page: { type: 'number' },
+						search: { type: 'string' },
+					},
+				},
+			},
+		},
+		searchBooksHandler
 	)
 }
 

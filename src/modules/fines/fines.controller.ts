@@ -13,6 +13,28 @@ type FineRequest = FastifyRequest<{
 	}
 }>
 
+export async function getFinesHandler(
+	request: FineRequest,
+	reply: FastifyReply
+) {
+	try {
+		const total = await prisma.borrows.count()
+		let { page } = request.query
+		if (!page) page = 1
+		const fines = await prisma.fines.findMany({
+			take: 13,
+			skip: (page - 1) * 13,
+		})
+		reply.code(200).send({
+			total,
+			page,
+			data: fines,
+		})
+	} catch (e) {
+		reply.code(500).send({ msg: e })
+	}
+}
+
 export async function getFineByBorrowIdHandler(
 	request: FineRequest,
 	reply: FastifyReply
