@@ -146,6 +146,25 @@ export async function getBooksHandler(
 	})
 }
 
+export async function getBookByIdHandler(
+	request: BookRequest,
+	reply: FastifyReply
+) {
+	try {
+		const bookId = request.params.bookId
+		const book = await prisma.books.findUnique({
+			where: {
+				BookID: bookId,
+			},
+		})
+		reply.code(200).send({
+			data: book,
+		})
+	} catch (e) {
+		reply.code(500).send({ msg: e })
+	}
+}
+
 export async function addBookHandler(
 	request: BookRequest,
 	reply: FastifyReply

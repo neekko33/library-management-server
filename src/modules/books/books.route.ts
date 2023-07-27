@@ -5,6 +5,7 @@ import {
 	updateBookHandler,
 	getBooksHandler,
 	searchBooksHandler,
+	getBookByIdHandler,
 } from './books.controller'
 
 async function bookRoutes(server: FastifyInstance) {
@@ -16,7 +17,6 @@ async function bookRoutes(server: FastifyInstance) {
 				body: {
 					type: 'object',
 					properties: {
-						id: { type: 'number' },
 						title: { type: 'string' },
 						author: { type: 'string' },
 						publicationDate: { type: 'string' },
@@ -30,7 +30,6 @@ async function bookRoutes(server: FastifyInstance) {
 						Introduction: { type: 'string' },
 					},
 					required: [
-						'bookId',
 						'title',
 						'author',
 						'publicationDate',
@@ -112,6 +111,23 @@ async function bookRoutes(server: FastifyInstance) {
 			},
 		},
 		getBooksHandler
+	)
+
+	server.get(
+		'/:bookId',
+		{
+			schema: {
+				tags: ['Book'],
+				params: {
+					type: 'object',
+					properties: {
+						bookId: { type: 'number' },
+					},
+					required: ['bookId'],
+				},
+			},
+		},
+		getBookByIdHandler
 	)
 
 	server.get(

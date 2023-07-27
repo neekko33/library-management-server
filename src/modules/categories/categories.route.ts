@@ -4,6 +4,7 @@ import {
 	deleteCategoryHandler,
 	updateCategoryHandler,
 	getCategoriesHandler,
+	getAllCategoriesHandler,
 } from './categories.controller'
 
 async function categoryRoutes(server: FastifyInstance) {
@@ -82,6 +83,8 @@ async function categoryRoutes(server: FastifyInstance) {
 		},
 		getCategoriesHandler
 	)
+
+	server.get('/all', {}, getAllCategoriesHandler)
 }
 
 export default categoryRoutes
