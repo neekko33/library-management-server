@@ -5,6 +5,7 @@ import {
 	updateCategoryHandler,
 	getCategoriesHandler,
 	getAllCategoriesHandler,
+	getCategoryByIdHandler,
 } from './categories.controller'
 
 async function categoryRoutes(server: FastifyInstance) {
@@ -82,6 +83,23 @@ async function categoryRoutes(server: FastifyInstance) {
 			},
 		},
 		getCategoriesHandler
+	)
+
+	server.get(
+		'/:cId',
+		{
+			schema: {
+				tags: ['Category'],
+				params: {
+					type: 'object',
+					properties: {
+						cId: { type: 'number' },
+					},
+					required: ['cId'],
+				},
+			},
+		},
+		getCategoryByIdHandler
 	)
 
 	server.get('/all', {}, getAllCategoriesHandler)

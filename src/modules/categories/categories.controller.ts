@@ -7,6 +7,7 @@ type CategoryRequest = FastifyRequest<{
 	}
 	Querystring: {
 		page?: number
+		search?: string
 	}
 	Body: {
 		categoryName: string
@@ -30,6 +31,25 @@ export async function getCategoriesHandler(
 			total,
 			page,
 			data: categories,
+		})
+	} catch (e) {
+		reply.code(500).send({ msg: e })
+	}
+}
+
+export async function getCategoryByIdHandler(
+	request: CategoryRequest,
+	reply: FastifyReply
+) {
+	try {
+		const categoryId = request.params.cId
+		const category = await prisma.categories.findUnique({
+			where: {
+				CategoryID: categoryId,
+			},
+		})
+		reply.code(200).send({
+			data: category,
 		})
 	} catch (e) {
 		reply.code(500).send({ msg: e })

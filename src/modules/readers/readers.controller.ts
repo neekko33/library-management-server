@@ -7,6 +7,7 @@ type ReaderRequest = FastifyRequest<{
 	}
 	Querystring: {
 		page?: number
+		search?: string
 	}
 	Body: {
 		name: string
@@ -15,6 +16,90 @@ type ReaderRequest = FastifyRequest<{
 		email: string
 	}
 }>
+
+type ReaderResult = {
+	ReaderID: number
+	Name: string | null
+	Phone: string | null
+	Email: string | null
+}
+
+export async function searchReaderHandler(
+	request: ReaderRequest,
+	reply: FastifyReply
+) {
+	try {
+		let { search, page } = request.query
+		if (!search) return
+		if (!page) page = 1
+		const total = await prisma.readers.count({
+			where: {
+				OR: [
+					{
+						Name: {
+							contains: search,
+						},
+					},
+					{
+						Phone: {
+							contains: search,
+						},
+					},
+					{
+						Email: {
+							contains: search,
+						},
+					},
+				],
+			},
+		})
+		const readers = await prisma.readers.findMany({
+			select: {
+				ReaderID: true,
+				Name: true,
+				Phone: true,
+				Email: true,
+			},
+			where: {
+				OR: [
+					{
+						Name: {
+							contains: search,
+						},
+					},
+					{
+						Phone: {
+							contains: search,
+						},
+					},
+					{
+						Email: {
+							contains: search,
+						},
+					},
+				],
+			},
+			take: 13,
+			skip: (page - 1) * 13,
+		})
+		const data: ReaderResult[] = []
+		readers.map(item => {
+			data.push({
+				ReaderID: item.ReaderID,
+				Name: item.Name,
+				Phone: item.Phone,
+				Email: item.Email,
+			})
+		})
+		reply.code(200).send({
+			total,
+			page,
+			data,
+		})
+	} catch (e) {
+		reply.code(500).send({ msg: e })
+	}
+}
 
 export async function getReaderHandler(
 	request: ReaderRequest,
@@ -38,16 +123,36 @@ export async function getReaderHandler(
 	}
 }
 
+export async function getReaderByIdHandler(
+	request: ReaderRequest,
+	reply: FastifyReply
+) {
+	try {
+		const readerId = request.params.rId
+		console.log('ReaderID:' + readerId)
+		const reader = await prisma.readers.findUnique({
+			where: {
+				ReaderID: readerId,
+			},
+		})
+		reply.code(200).send({
+			data: reader,
+		})
+	} catch (e) {
+		reply.code(500).send({ msg: e })
+	}
+}
+
 export async function addReaderHandler(
 	request: ReaderRequest,
 	reply: FastifyReply
 ) {
-	const { name, password, phone, email } = request.body
+	const { name, phone, email } = request.body
 	try {
 		await prisma.readers.create({
 			data: {
 				Name: name,
-				Password: password,
+				Password: phone,
 				Phone: phone,
 				Email: email,
 			},
@@ -64,7 +169,7 @@ export async function updateReaderHandler(
 ) {
 	const { rId } = request.params
 	if (!rId) reply.code(500).send({ msg: 'need reader id.' })
-	const { name, password, phone, email } = request.body
+	const { name, phone, email } = request.body
 	try {
 		await prisma.readers.update({
 			where: {
@@ -72,7 +177,6 @@ export async function updateReaderHandler(
 			},
 			data: {
 				Name: name,
-				Password: password,
 				Phone: phone,
 				Email: email,
 			},

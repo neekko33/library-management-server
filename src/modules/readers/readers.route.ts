@@ -4,6 +4,8 @@ import {
 	deleteReaderHandler,
 	updateReaderHandler,
 	getReaderHandler,
+	getReaderByIdHandler,
+	searchReaderHandler,
 } from './readers.controller'
 
 async function readerRoutes(server: FastifyInstance) {
@@ -16,11 +18,10 @@ async function readerRoutes(server: FastifyInstance) {
 					type: 'object',
 					properties: {
 						name: { type: 'string' },
-						password: { type: 'string' },
 						phone: { type: 'string' },
 						email: { type: 'string' },
 					},
-					required: ['name', 'password', 'phone', 'email'],
+					required: ['name', 'phone', 'email'],
 				},
 			},
 		},
@@ -58,10 +59,10 @@ async function readerRoutes(server: FastifyInstance) {
 					type: 'object',
 					properties: {
 						name: { type: 'string' },
-						password: { type: 'string' },
-						contactInformation: { type: 'string' },
+						phone: { type: 'string' },
+						email: { type: 'string' },
 					},
-					required: ['name', 'password', 'contactInformation'],
+					required: ['name', 'email', 'phone'],
 				},
 			},
 		},
@@ -82,6 +83,40 @@ async function readerRoutes(server: FastifyInstance) {
 			},
 		},
 		getReaderHandler
+	)
+
+	server.get(
+		'/:rId',
+		{
+			schema: {
+				tags: ['Reader'],
+				params: {
+					type: 'object',
+					properties: {
+						rId: { type: 'number' },
+					},
+					required: ['rId'],
+				},
+			},
+		},
+		getReaderByIdHandler
+	)
+
+	server.get(
+		'/search',
+		{
+			schema: {
+				tags: ['Reader'],
+				querystring: {
+					type: 'object',
+					properties: {
+						page: { type: 'number' },
+						search: { type: 'string' },
+					},
+				},
+			},
+		},
+		searchReaderHandler
 	)
 }
 
