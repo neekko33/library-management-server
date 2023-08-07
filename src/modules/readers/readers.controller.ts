@@ -17,13 +17,6 @@ type ReaderRequest = FastifyRequest<{
 	}
 }>
 
-type ReaderResult = {
-	ReaderID: number
-	Name: string | null
-	Phone: string | null
-	Email: string | null
-}
-
 export async function searchReaderHandler(
 	request: ReaderRequest,
 	reply: FastifyReply
@@ -82,19 +75,10 @@ export async function searchReaderHandler(
 			take: 13,
 			skip: (page - 1) * 13,
 		})
-		const data: ReaderResult[] = []
-		readers.map(item => {
-			data.push({
-				ReaderID: item.ReaderID,
-				Name: item.Name,
-				Phone: item.Phone,
-				Email: item.Email,
-			})
-		})
 		reply.code(200).send({
 			total,
 			page,
-			data,
+			data: readers,
 		})
 	} catch (e) {
 		reply.code(500).send({ msg: e })
@@ -110,6 +94,12 @@ export async function getReaderHandler(
 		let { page } = request.query
 		if (!page) page = 1
 		const readers = await prisma.readers.findMany({
+			select: {
+				ReaderID: true,
+				Name: true,
+				Phone: true,
+				Email: true,
+			},
 			take: 13,
 			skip: (page - 1) * 13,
 		})
@@ -129,8 +119,13 @@ export async function getReaderByIdHandler(
 ) {
 	try {
 		const readerId = request.params.rId
-		console.log('ReaderID:' + readerId)
 		const reader = await prisma.readers.findUnique({
+			select: {
+				ReaderID: true,
+				Name: true,
+				Phone: true,
+				Email: true,
+			},
 			where: {
 				ReaderID: readerId,
 			},
