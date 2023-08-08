@@ -49,6 +49,7 @@ const start = async () => {
 	try {
 		await server.listen({ port: 7001 })
 	} catch (e) {
+		console.log(e)
 		server.log.error(e)
 		process.exit(1)
 	}

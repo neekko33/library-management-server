@@ -102,7 +102,15 @@ async function categoryRoutes(server: FastifyInstance) {
 		getCategoryByIdHandler
 	)
 
-	server.get('/all', {}, getAllCategoriesHandler)
+	server.get(
+		'/all',
+		{
+			schema: {
+				tags: ['Category'],
+			},
+		},
+		getAllCategoriesHandler
+	)
 }
 
 export default categoryRoutes
