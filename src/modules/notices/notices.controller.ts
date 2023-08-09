@@ -159,7 +159,7 @@ export async function addNoticeHandler(
 				UserID: userId,
 			},
 		})
-		reply.code(200).send({ msg: 'success' })
+		reply.code(200).send({ msg: '操作成功' })
 	} catch (e) {
 		reply.code(500).send({ msg: e })
 	}
@@ -170,7 +170,7 @@ export async function updateNoticeHandler(
 	reply: FastifyReply
 ) {
 	const { nId } = request.params
-	if (!nId) reply.code(500).send({ msg: 'need notice id.' })
+	if (!nId) reply.code(500).send({ msg: 'ID格式错误，请重新操作' })
 	const { title, content } = request.body
 	try {
 		await prisma.notices.update({
@@ -182,7 +182,7 @@ export async function updateNoticeHandler(
 				Content: content,
 			},
 		})
-		reply.code(200).send({ msg: 'success' })
+		reply.code(200).send({ msg: '操作成功' })
 	} catch (e) {
 		reply.code(500).send({ msg: e })
 	}
@@ -193,14 +193,14 @@ export async function deleteNoticeHandler(
 	reply: FastifyReply
 ) {
 	const { nId } = request.params
-	if (!nId) reply.code(500).send({ msg: 'need notice id.' })
+	if (!nId) reply.code(500).send({ msg: 'ID格式错误，请重新操作' })
 	try {
 		await prisma.notices.delete({
 			where: {
 				NoticeID: nId,
 			},
 		})
-		reply.code(200).send({ msg: 'success' })
+		reply.code(200).send({ msg: '操作成功' })
 	} catch (e) {
 		reply.code(500).send({ msg: e })
 	}

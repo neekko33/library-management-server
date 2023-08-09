@@ -8,6 +8,7 @@ type BorrowRequest = FastifyRequest<{
 	}
 	Querystring: {
 		page?: number
+		search?: string
 	}
 	Body: {
 		bookId: number
@@ -35,10 +36,113 @@ async function checkOverdueByReaderId(readerId: number, reply: FastifyReply) {
 				IsOverdue: true,
 			},
 		})
-		if (overdueCount > 0)
+		if (overdueCount > 0) {
 			reply.code(500).send({ msg: '有未结清罚款的逾期图书，请结清后重试' })
+			return true
+		}
+		return false
 	} catch (e) {
-		reply.code(500).send({ mgs: e })
+		reply.code(500).send({ msg: e })
+		return true
+	}
+}
+
+export async function searchBorrowsHandler(
+	request: BorrowRequest,
+	reply: FastifyReply
+) {
+	try {
+		let { search, page } = request.query
+		if (!search) return
+		if (!page) page = 1
+		const allRecords = await prisma.borrows.findMany({
+			where: {
+				OR: [
+					{
+						Readers: {
+							Name: {
+								contains: search,
+							},
+						},
+					},
+					{
+						Books: {
+							Title: {
+								contains: search,
+							},
+						},
+					},
+				],
+			},
+			include: {
+				Readers: {
+					select: {
+						Name: true,
+					},
+				},
+				Books: {
+					select: {
+						Title: true,
+					},
+				},
+			},
+		})
+		const total = allRecords.length
+		const borrows = await prisma.borrows.findMany({
+			where: {
+				OR: [
+					{
+						Readers: {
+							Name: {
+								contains: search,
+							},
+						},
+					},
+					{
+						Books: {
+							Title: {
+								contains: search,
+							},
+						},
+					},
+				],
+			},
+			include: {
+				Readers: {
+					select: {
+						Name: true,
+					},
+				},
+				Books: {
+					select: {
+						Title: true,
+					},
+				},
+			},
+			take: 13,
+			skip: (page - 1) * 13,
+		})
+		const data: BorrowResult[] = []
+		borrows.map(item => {
+			data.push({
+				BorrowID: item.BorrowID,
+				BookName: item.Books.Title,
+				BookID: item.BookID,
+				ReaderName: item.Readers.Name,
+				ReaderID: item.ReaderID,
+				BorrowDate: item.BorrowDate,
+				DueDate: item.DueDate,
+				ReturnDate: item.ReturnDate,
+				IsOverdue: item.IsOverdue,
+			})
+		})
+		reply.code(200).send({
+			total,
+			page,
+			data,
+		})
+	} catch (e) {
+		reply.code(500).send({ msg: e })
 	}
 }
 
@@ -119,20 +223,35 @@ export async function addBorrowHandler(
 	reply: FastifyReply
 ) {
 	const { bookId, readerId } = request.body
-	await checkOverdueByReaderId(readerId, reply)
-	const borrowDate = new Date()
+	const isOverdue = await checkOverdueByReaderId(readerId, reply)
+	if (isOverdue) return
 	try {
+		const book = await prisma.books.findUnique({
+			select: { AvailabilityStatus: true },
+			where: { BookID: bookId },
+		})
+		if (!book || book.AvailabilityStatus == '借出') {
+			reply.code(500).send({ msg: '该图书不存在或已借出，请重新操作' })
+			return
+		}
+		const borrowDate = new Date()
+		const dueDate = new Date(new Date().getTime() + 30 * 24 * 60 * 60 * 1000)
 		await prisma.borrows.create({
 			data: {
 				BookID: bookId,
 				ReaderID: readerId,
 				BorrowDate: borrowDate,
+				DueDate: dueDate,
 				IsOverdue: false,
 			},
 		})
-		reply.code(200).send({ msg: 'success' })
+		await prisma.books.update({
+			where: { BookID: bookId },
+			data: { AvailabilityStatus: '借出' },
+		})
+		reply.code(200).send({ msg: '操作成功' })
 	} catch (e) {
-		reply.code(500).send({ mgs: e })
+		reply.code(500).send({ msg: e })
 	}
 }
 
@@ -141,11 +260,19 @@ export async function deleteBorrowHandler(
 	reply: FastifyReply
 ) {
 	const { bId } = request.params
-	if (!bId) reply.code(500).send({ msg: 'need borrow id.' })
-	const { readerId } = request.body
-	await checkOverdueByReaderId(readerId, reply)
+	if (!bId) reply.code(500).send({ msg: 'ID格式错误，请重新操作' })
 	const returnDate = new Date()
 	try {
+		const borrow = await prisma.borrows.findUnique({
+			select: { BookID: true, ReaderID: true },
+			where: { BorrowID: bId },
+		})
+		if (!borrow) {
+			reply.code(500).send({ msg: '借阅记录不存在，请重新操作' })
+			return
+		}
+		const isOverdue = await checkOverdueByReaderId(borrow.ReaderID, reply)
+		if (isOverdue) return
 		await prisma.borrows.update({
 			where: {
 				BorrowID: bId,
@@ -154,7 +281,11 @@ export async function deleteBorrowHandler(
 				ReturnDate: returnDate,
 			},
 		})
-		reply.code(200).send({ msg: 'success' })
+		await prisma.books.update({
+			where: { BookID: borrow.BookID },
+			data: { AvailabilityStatus: '在馆' },
+		})
+		reply.code(200).send({ msg: '操作成功' })
 	} catch (e) {
 		reply.code(500).send({ msg: e })
 	}
@@ -166,20 +297,30 @@ export async function renewBorrowHandler(
 	reply: FastifyReply
 ) {
 	const { bId } = request.params
-	if (!bId) reply.code(500).send({ msg: 'need borrow id.' })
-	const { readerId } = request.body
-	await checkOverdueByReaderId(readerId, reply)
-	const borrowDate = new Date()
+	if (!bId) reply.code(500).send({ msg: 'ID格式错误，请重新操作' })
 	try {
+		const borrow = await prisma.borrows.findUnique({
+			select: { DueDate: true, ReaderID: true },
+			where: { BorrowID: bId },
+		})
+		if (!borrow) {
+			reply.code(500).send({ msg: '借阅记录不存在，请重新操作' })
+			return
+		}
+		const isOverdue = await checkOverdueByReaderId(borrow.ReaderID, reply)
+		if (isOverdue) return
+		const newDueDate = new Date(
+			borrow.DueDate.getTime() + 30 * 24 * 60 * 60 * 1000
+		)
 		await prisma.borrows.update({
 			where: {
 				BorrowID: bId,
 			},
 			data: {
-				BorrowDate: borrowDate,
+				DueDate: newDueDate,
 			},
 		})
-		reply.code(200).send({ mgs: 'success' })
+		reply.code(200).send({ msg: '操作成功' })
 	} catch (e) {
 		reply.code(500).send({ msg: e })
 	}
@@ -196,9 +337,8 @@ export async function checkOverdueAll() {
 		const overdueBorrowIds: number[] = []
 		borrows.map(item => {
 			const days =
-				(new Date().getTime() - item.BorrowDate.getTime()) /
-				(1000 * 60 * 60 * 24)
-			if (days >= 31) {
+				(new Date().getTime() - item.DueDate.getTime()) / (1000 * 60 * 60 * 24)
+			if (days >= 1) {
 				overdueBorrowIds.push(item.BorrowID)
 			}
 		})

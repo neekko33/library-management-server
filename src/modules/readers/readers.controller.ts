@@ -152,7 +152,7 @@ export async function addReaderHandler(
 				Email: email,
 			},
 		})
-		reply.code(200).send({ msg: 'success' })
+		reply.code(200).send({ msg: '操作成功' })
 	} catch (e) {
 		reply.code(500).send({ msg: e })
 	}
@@ -163,7 +163,7 @@ export async function updateReaderHandler(
 	reply: FastifyReply
 ) {
 	const { rId } = request.params
-	if (!rId) reply.code(500).send({ msg: 'need reader id.' })
+	if (!rId) reply.code(500).send({ msg: 'ID格式错误，请重新操作' })
 	const { name, phone, email } = request.body
 	try {
 		await prisma.readers.update({
@@ -176,7 +176,7 @@ export async function updateReaderHandler(
 				Email: email,
 			},
 		})
-		reply.code(200).send({ msg: 'success' })
+		reply.code(200).send({ msg: '操作成功' })
 	} catch (e) {
 		reply.code(500).send({ msg: e })
 	}
@@ -187,14 +187,14 @@ export async function deleteReaderHandler(
 	reply: FastifyReply
 ) {
 	const { rId } = request.params
-	if (!rId) reply.code(500).send({ msg: 'need reader id.' })
+	if (!rId) reply.code(500).send({ msg: 'ID格式错误，请重新操作' })
 	try {
 		await prisma.readers.delete({
 			where: {
 				ReaderID: rId,
 			},
 		})
-		reply.code(200).send({ msg: 'success' })
+		reply.code(200).send({ msg: '操作成功' })
 	} catch (e) {
 		reply.code(500).send({ msg: e })
 	}

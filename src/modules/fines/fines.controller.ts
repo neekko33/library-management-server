@@ -75,7 +75,7 @@ export async function payFineHandler(
 				IsOverdue: false,
 			},
 		})
-		reply.code(200).send({ msg: 'success' })
+		reply.code(200).send({ msg: '操作成功' })
 	} catch (e) {
 		reply.code(500).send({ msg: e })
 	}

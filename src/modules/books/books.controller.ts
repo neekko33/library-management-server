@@ -199,7 +199,7 @@ export async function addBookHandler(
 		},
 	})
 	reply.code(200).send({
-		msg: 'success',
+		msg: '操作成功',
 	})
 }
 
@@ -239,7 +239,7 @@ export async function updateBookHandler(
 		},
 	})
 	reply.code(200).send({
-		msg: 'success',
+		msg: '操作成功',
 	})
 }
 
@@ -252,6 +252,6 @@ export async function deleteBookHandler(
 		where: { BookID: request.params.bookId },
 	})
 	reply.code(200).send({
-		msg: 'success',
+		msg: '操作成功',
 	})
 }

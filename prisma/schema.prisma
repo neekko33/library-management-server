@@ -73,7 +73,7 @@ model Borrows {
   BorrowDate DateTime  @db.Date
   ReturnDate DateTime? @db.Date
   IsOverdue  Boolean
-  DueDate    DateTime? @db.Date
+  DueDate    DateTime  @db.Date
   Books      Books     @relation(fields: [BookID], references: [BookID], onDelete: NoAction, onUpdate: NoAction, map: "Borrows_ibfk_1")
   Readers    Readers   @relation(fields: [ReaderID], references: [ReaderID], onDelete: NoAction, onUpdate: NoAction, map: "Borrows_ibfk_2")
   Fines      Fines[]

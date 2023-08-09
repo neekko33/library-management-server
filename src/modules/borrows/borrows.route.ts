@@ -5,6 +5,7 @@ import {
 	addBorrowHandler,
 	renewBorrowHandler,
 	getBorrowsByReadIdHandler,
+	searchBorrowsHandler,
 } from './borrows.controller'
 
 async function borrowRoutes(server: FastifyInstance) {
@@ -37,13 +38,6 @@ async function borrowRoutes(server: FastifyInstance) {
 						bId: { type: 'number' },
 					},
 					required: ['bId'],
-				},
-				body: {
-					type: 'object',
-					properties: {
-						readerId: { type: 'number' },
-					},
-					required: ['readerId'],
 				},
 			},
 		},
@@ -100,16 +94,26 @@ async function borrowRoutes(server: FastifyInstance) {
 					},
 					required: ['bId'],
 				},
-				body: {
-					type: 'object',
-					properties: {
-						readerId: { type: 'number' },
-					},
-					required: ['readerId'],
-				},
 			},
 		},
 		renewBorrowHandler
+	)
+
+	server.get(
+		'/search',
+		{
+			schema: {
+				tags: ['Borrow'],
+				querystring: {
+					type: 'object',
+					properties: {
+						page: { type: 'number' },
+						search: { type: 'string' },
+					},
+				},
+			},
+		},
+		searchBorrowsHandler
 	)
 }
 

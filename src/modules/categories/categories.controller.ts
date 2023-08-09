@@ -87,7 +87,7 @@ export async function addCategoryHandler(
 				CategoryChar: categoryChar,
 			},
 		})
-		reply.code(200).send({ msg: 'success' })
+		reply.code(200).send({ msg: '操作成功' })
 	} catch (e) {
 		reply.code(500).send({ msg: e })
 	}
@@ -98,7 +98,7 @@ export async function updateCategoryHandler(
 	reply: FastifyReply
 ) {
 	const { cId } = request.params
-	if (!cId) reply.code(500).send({ msg: 'need category id.' })
+	if (!cId) reply.code(500).send({ msg: 'ID格式错误，请重新操作' })
 	const { categoryName, categoryChar } = request.body
 	try {
 		await prisma.categories.update({
@@ -110,7 +110,7 @@ export async function updateCategoryHandler(
 				CategoryChar: categoryChar,
 			},
 		})
-		reply.code(200).send({ msg: 'success' })
+		reply.code(200).send({ msg: '操作成功' })
 	} catch (e) {
 		reply.code(500).send({ msg: e })
 	}
@@ -121,14 +121,14 @@ export async function deleteCategoryHandler(
 	reply: FastifyReply
 ) {
 	const { cId } = request.params
-	if (!cId) reply.code(500).send({ msg: 'need category id.' })
+	if (!cId) reply.code(500).send({ msg: 'ID格式错误，请重新操作' })
 	try {
 		await prisma.categories.delete({
 			where: {
 				CategoryID: cId,
 			},
 		})
-		reply.code(200).send({ msg: 'success' })
+		reply.code(200).send({ msg: '操作成功' })
 	} catch (e) {
 		reply.code(500).send({ msg: e })
 	}
