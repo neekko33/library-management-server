@@ -23,17 +23,23 @@ async function fineRoutes(server: FastifyInstance) {
 		getFinesHandler
 	)
 
-	server.post(
-		'/',
+	server.get(
+		'/:bId',
 		{
 			schema: {
 				tags: ['Fine'],
-				body: {
+				querystring: {
 					type: 'object',
 					properties: {
-						borrowId: { type: 'number' },
+						page: { type: 'number' },
 					},
-					required: ['borrowId'],
+				},
+				params: {
+					type: 'object',
+					properties: {
+						bId: { type: 'number' },
+					},
+					required: ['bId'],
 				},
 			},
 		},
@@ -51,13 +57,6 @@ async function fineRoutes(server: FastifyInstance) {
 						fId: { type: 'number' },
 					},
 					required: ['fId'],
-				},
-				body: {
-					type: 'object',
-					properties: {
-						borrowId: { type: 'number' },
-					},
-					required: ['borrowId'],
 				},
 			},
 		},

@@ -13,6 +13,7 @@ type UserRequest = FastifyRequest<{
 		username: string
 		password: string
 		userType: string
+		newPassword?: string
 	}
 }>
 
@@ -154,7 +155,10 @@ export async function updateUserHandler(
 	reply: FastifyReply
 ) {
 	const { uId } = request.params
-	if (!uId) reply.code(500).send({ msg: 'ID格式错误，请重新操作' })
+	if (!uId) {
+		reply.code(500).send({ msg: 'ID格式错误，请重新操作' })
+		return
+	}
 	const { username, userType } = request.body
 	try {
 		await prisma.users.update({
@@ -177,11 +181,78 @@ export async function deleteUserHandler(
 	reply: FastifyReply
 ) {
 	const { uId } = request.params
-	if (!uId) reply.code(500).send({ msg: 'ID格式错误，请重新操作' })
+	if (!uId) {
+		reply.code(500).send({ msg: 'ID格式错误，请重新操作' })
+		return
+	}
 	try {
 		await prisma.users.delete({
 			where: {
 				UserID: uId,
+			},
+		})
+		reply.code(200).send({ msg: '操作成功' })
+	} catch (e) {
+		reply.code(500).send({ msg: e })
+	}
+}
+
+export async function updateUserInfoHandler(
+	request: UserRequest,
+	reply: FastifyReply
+) {
+	const { uId } = request.params
+	const username = request.body.username
+	if (!uId) {
+		reply.code(500).send({ msg: 'ID格式错误，请重新操作' })
+		return
+	}
+	try {
+		await prisma.users.update({
+			where: {
+				UserID: uId,
+			},
+			data: {
+				Username: username,
+			},
+		})
+		reply.code(200).send({ msg: '操作成功' })
+	} catch (e) {
+		reply.code(500).send({ msg: e })
+	}
+}
+
+export async function updatePasswordHandler(
+	request: UserRequest,
+	reply: FastifyReply
+) {
+	const { uId } = request.params
+	const { password, newPassword } = request.body
+	if (!uId) {
+		reply.code(500).send({ msg: 'ID格式错误，请重新操作' })
+		return
+	}
+	if (!newPassword) {
+		reply.code(500).send({ msg: '密码格式错误，请重新操作' })
+		return
+	}
+	try {
+		const count = await prisma.users.count({
+			where: {
+				UserID: uId,
+				Password: password,
+			},
+		})
+		if (count == 0) {
+			reply.code(500).send({ msg: '原始密码错误，请重新操作' })
+			return
+		}
+		await prisma.users.update({
+			where: {
+				UserID: uId,
+			},
+			data: {
+				Password: newPassword,
 			},
 		})
 		reply.code(200).send({ msg: '操作成功' })

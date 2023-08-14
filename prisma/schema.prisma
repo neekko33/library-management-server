@@ -83,11 +83,11 @@ model Borrows {
 }
 
 model Fines {
-  FineID     Int      @id @default(autoincrement())
-  BorrowID   Int?
-  FineAmount Decimal? @db.Decimal(10, 2)
-  IsPaid     Boolean?
-  Borrows    Borrows? @relation(fields: [BorrowID], references: [BorrowID], onDelete: NoAction, onUpdate: NoAction, map: "Fines_ibfk_1")
+  FineID     Int     @id @default(autoincrement())
+  BorrowID   Int
+  FineAmount Decimal @db.Decimal(10, 2)
+  IsPaid     Boolean
+  Borrows    Borrows @relation(fields: [BorrowID], references: [BorrowID], onDelete: NoAction, onUpdate: NoAction, map: "Fines_ibfk_1")
 
   @@index([BorrowID], map: "BorrowID")
 }

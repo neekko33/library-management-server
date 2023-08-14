@@ -7,6 +7,8 @@ import {
 	loginHandler,
 	getUserByIdHandler,
 	searchUserHandler,
+	updateUserInfoHandler,
+	updatePasswordHandler,
 } from './users.controller'
 
 async function userRoutes(server: FastifyInstance) {
@@ -86,6 +88,55 @@ async function userRoutes(server: FastifyInstance) {
 			},
 		},
 		updateUserHandler
+	)
+
+	server.put(
+		'/info/:uId',
+		{
+			schema: {
+				tags: ['User'],
+				params: {
+					type: 'object',
+					properties: {
+						uId: { type: 'number' },
+					},
+					required: ['uId'],
+				},
+				body: {
+					type: 'object',
+					properties: {
+						username: { type: 'string' },
+					},
+					required: ['username'],
+				},
+			},
+		},
+		updateUserInfoHandler
+	)
+
+	server.put(
+		'/password/:uId',
+		{
+			schema: {
+				tags: ['User'],
+				params: {
+					type: 'object',
+					properties: {
+						uId: { type: 'number' },
+					},
+					required: ['uId'],
+				},
+				body: {
+					type: 'object',
+					properties: {
+						password: { type: 'string' },
+						newPassword: { type: 'string' },
+					},
+					required: ['password', 'newPassword'],
+				},
+			},
+		},
+		updatePasswordHandler
 	)
 
 	server.get(
