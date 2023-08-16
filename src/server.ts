@@ -14,22 +14,22 @@ import { checkOverdueAll } from './modules/borrows/borrows.controller'
 const server: FastifyInstance = Fastify({})
 
 const swaggerOptions = {
-	swagger: {
-		info: {
-			title: 'Library Management System',
-			description: 'My Description.',
-			version: '1.0.0',
-		},
-		host: 'localhost:7001',
-		schemes: ['http'],
-		consumes: ['application/json'],
-		produces: ['application/json'],
-	},
+  swagger: {
+    info: {
+      title: 'Library Management System',
+      description: 'My Description.',
+      version: '1.0.0',
+    },
+    host: 'localhost:7001',
+    schemes: ['http'],
+    consumes: ['application/json'],
+    produces: ['application/json'],
+  },
 }
 
 const swaggerUiOptions = {
-	routePrefix: '/docs',
-	exposeRoute: true,
+  routePrefix: '/docs',
+  exposeRoute: true,
 }
 
 server.register(cors)
@@ -46,13 +46,13 @@ server.register(borrowRoutes, { prefix: 'api/borrows' })
 server.register(fineRoutes, { prefix: '/api/fines' })
 
 const start = async () => {
-	try {
-		await server.listen({ port: 7001 })
-	} catch (e) {
-		console.log(e)
-		server.log.error(e)
-		process.exit(1)
-	}
+  try {
+    await server.listen({ port: 7001 })
+  } catch (e) {
+    console.log(e)
+    server.log.error(e)
+    process.exit(1)
+  }
 }
 
 checkOverdueAll()
