@@ -6,6 +6,7 @@ import {
   getBooksHandler,
   searchBooksHandler,
   getBookByIdHandler,
+  homeSearchHandler,
 } from './books.controller'
 
 async function bookRoutes(server: FastifyInstance) {
@@ -145,6 +146,24 @@ async function bookRoutes(server: FastifyInstance) {
       },
     },
     searchBooksHandler
+  )
+
+  server.get(
+    '/home/search',
+    {
+      schema: {
+        tags: ['Book'],
+        querystring: {
+          type: 'object',
+          properties: {
+            page: { type: 'number' },
+            search: { type: 'string' },
+            categoryId: { type: 'number' },
+          },
+        },
+      },
+    },
+    homeSearchHandler
   )
 }
 

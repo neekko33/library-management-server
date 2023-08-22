@@ -8,6 +8,7 @@ type BookRequest = FastifyRequest<{
   Querystring: {
     page?: number
     search?: string
+    categoryId?: number
   }
   Body: {
     title: string
@@ -34,6 +35,136 @@ type BookResult = {
   Category: string | null
   AvailabilityStatus: string | null
   Location: string | null
+}
+
+export async function homeSearchHandler(
+  request: BookRequest,
+  reply: FastifyReply
+) {
+  try {
+    let { search, page, categoryId } = request.query
+    if (!page) page = 1
+    let total, data
+    if (!categoryId) {
+      if (!search) {
+        total = await prisma.books.count()
+        data = await prisma.books.findMany({
+          include: { Categories: true },
+          take: 13,
+          skip: (page - 1) * 13,
+        })
+      } else {
+        total = await prisma.books.count({
+          where: {
+            OR: [
+              {
+                Title: {
+                  contains: search,
+                },
+              },
+              {
+                Author: {
+                  contains: search,
+                },
+              },
+            ],
+          },
+        })
+        data = await prisma.books.findMany({
+          where: {
+            OR: [
+              {
+                Title: {
+                  contains: search,
+                },
+              },
+              {
+                Author: {
+                  contains: search,
+                },
+              },
+            ],
+          },
+          include: { Categories: true },
+          take: 13,
+          skip: (page - 1) * 13,
+        })
+      }
+    } else {
+      if (!search) {
+        const allData = await prisma.books.findMany({
+          where: {
+            Categories: {
+              CategoryID: categoryId,
+            },
+          },
+          include: { Categories: { select: { CategoryID: true } } },
+        })
+        total = allData.length
+        data = await prisma.books.findMany({
+          where: {
+            Categories: {
+              CategoryID: categoryId,
+            },
+          },
+          take: 13,
+          skip: (page - 1) * 13,
+          include: { Categories: { select: { CategoryID: true } } },
+        })
+      } else {
+        const allData = await prisma.books.findMany({
+          where: {
+            Categories: {
+              CategoryID: categoryId,
+            },
+            OR: [
+              {
+                Title: {
+                  contains: search,
+                },
+              },
+              {
+                Author: {
+                  contains: search,
+                },
+              },
+            ],
+          },
+          include: { Categories: { select: { CategoryID: true } } },
+        })
+        total = allData.length
+        data = await prisma.books.findMany({
+          where: {
+            Categories: {
+              CategoryID: categoryId,
+            },
+            OR: [
+              {
+                Title: {
+                  contains: search,
+                },
+              },
+              {
+                Author: {
+                  contains: search,
+                },
+              },
+            ],
+          },
+          take: 13,
+          skip: (page - 1) * 13,
+          include: { Categories: { select: { CategoryID: true } } },
+        })
+      }
+    }
+    reply.code(200).send({
+      total,
+      page,
+      data,
+    })
+  } catch (e) {
+    reply.code(500).send({ msg: e })
+  }
 }
 
 export async function searchBooksHandler(
