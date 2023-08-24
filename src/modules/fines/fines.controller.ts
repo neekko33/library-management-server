@@ -36,6 +36,31 @@ export async function getFinesHandler(
   }
 }
 
+// TODO:完成接口
+export async function getFineByReaderIdHandler(
+  request: FineRequest,
+  reply: FastifyReply
+) {
+  try {
+    const total = await prisma.fines.count({
+      where: {},
+    })
+    let { page } = request.query
+    if (!page) page = 1
+    const fines = await prisma.fines.findMany({
+      take: 7,
+      skip: (page - 1) * 7,
+    })
+    reply.code(200).send({
+      total,
+      page,
+      data: fines,
+    })
+  } catch (e) {
+    reply.code(500).send({ msg: e })
+  }
+}
+
 export async function getFineByBorrowIdHandler(
   request: FineRequest,
   reply: FastifyReply
