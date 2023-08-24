@@ -202,12 +202,70 @@ export async function getBorrowsByReadIdHandler(
     const { rId } = request.params
     const total = await prisma.borrows.count({
       where: {
-        ReaderID: rId,
+        // ReaderID: rId,
+        ReturnDate: null,
       },
     })
     let { page } = request.query
     if (!page) page = 1
-    const borrows = await prisma.borrows.findMany()
+    const borrows = await prisma.borrows.findMany({
+      where: {
+        // ReaderID: rId,
+        ReturnDate: null,
+      },
+      take: 7,
+      skip: (page - 1) * 7,
+      include: {
+        Books: {
+          select: {
+            Title: true,
+          },
+        },
+      },
+    })
+    reply.code(200).send({
+      total,
+      page,
+      data: borrows,
+    })
+  } catch (e) {
+    reply.code(500).send({ msg: e })
+  }
+}
+
+export async function getBorrowsHistoryByReadIdHandler(
+  request: BorrowRequest,
+  reply: FastifyReply
+) {
+  try {
+    const { rId } = request.params
+    const total = await prisma.borrows.count({
+      where: {
+        // ReaderID: rId,
+        ReturnDate: {
+          not: null,
+        },
+      },
+    })
+    let { page } = request.query
+    if (!page) page = 1
+    const borrows = await prisma.borrows.findMany({
+      where: {
+        // ReaderID: rId,
+        ReturnDate: {
+          not: null,
+        },
+      },
+      take: 7,
+      skip: (page - 1) * 7,
+      include: {
+        Books: {
+          select: {
+            Title: true,
+          },
+        },
+      },
+    })
     reply.code(200).send({
       total,
       page,

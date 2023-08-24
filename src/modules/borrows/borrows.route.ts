@@ -6,6 +6,7 @@ import {
   renewBorrowHandler,
   getBorrowsByReadIdHandler,
   searchBorrowsHandler,
+  getBorrowsHistoryByReadIdHandler,
 } from './borrows.controller'
 
 async function borrowRoutes(server: FastifyInstance) {
@@ -80,6 +81,28 @@ async function borrowRoutes(server: FastifyInstance) {
       },
     },
     getBorrowsByReadIdHandler
+  )
+
+  server.get(
+    '/history/:rId',
+    {
+      schema: {
+        tags: ['Borrow'],
+        params: {
+          type: 'object',
+          properties: {
+            rId: { type: 'number' },
+          },
+        },
+        querystring: {
+          type: 'object',
+          properties: {
+            page: { type: 'number' },
+          },
+        },
+      },
+    },
+    getBorrowsHistoryByReadIdHandler
   )
 
   server.put(

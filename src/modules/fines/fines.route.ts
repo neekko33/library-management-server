@@ -4,6 +4,7 @@ import {
   payFineHandler,
   getFineByBorrowIdHandler,
   getFinesHandler,
+  getFineByReaderIdHandler,
 } from './fines.controller'
 
 async function fineRoutes(server: FastifyInstance) {
@@ -44,6 +45,29 @@ async function fineRoutes(server: FastifyInstance) {
       },
     },
     getFineByBorrowIdHandler
+  )
+
+  server.get(
+    '/history/:rId',
+    {
+      schema: {
+        tags: ['Fine'],
+        querystring: {
+          type: 'object',
+          properties: {
+            page: { type: 'number' },
+          },
+        },
+        params: {
+          type: 'object',
+          properties: {
+            rId: { type: 'number' },
+          },
+          required: ['rId'],
+        },
+      },
+    },
+    getFineByReaderIdHandler
   )
 
   server.put(
