@@ -6,9 +6,28 @@ import {
   getReaderHandler,
   getReaderByIdHandler,
   searchReaderHandler,
+  loginHandler,
 } from './readers.controller'
 
 async function readerRoutes(server: FastifyInstance) {
+  server.post(
+    '/login',
+    {
+      schema: {
+        tags: ['Reader'],
+        body: {
+          type: 'object',
+          properties: {
+            name: { type: 'string' },
+            password: { type: 'string' },
+          },
+          required: ['name', 'password'],
+        },
+      },
+    },
+    loginHandler
+  )
+
   server.post(
     '/',
     {

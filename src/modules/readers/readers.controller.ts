@@ -17,6 +17,35 @@ type ReaderRequest = FastifyRequest<{
   }
 }>
 
+export async function loginHandler(
+  request: ReaderRequest,
+  reply: FastifyReply
+) {
+  try {
+    const { name, password } = request.body
+    const reader = await prisma.readers.findFirst({
+      select: {
+        ReaderID: true,
+        Name: true,
+      },
+      where: {
+        Name: name,
+        Password: password,
+      },
+    })
+    if (reader) {
+      reply.code(200).send({
+        msg: '登录成功',
+        data: reader,
+      })
+    } else {
+      reply.code(500).send({ mgs: '用户名或密码错误' })
+    }
+  } catch (e) {
+    reply.code(500).send({ mgs: e })
+  }
+}
+
 export async function searchReaderHandler(
   request: ReaderRequest,
   reply: FastifyReply
