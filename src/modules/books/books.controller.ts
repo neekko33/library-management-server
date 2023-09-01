@@ -44,118 +44,88 @@ export async function homeSearchHandler(
   try {
     let { search, page, categoryId } = request.query
     if (!page) page = 1
+    if (!search) search = ''
     let total, data
     if (!categoryId) {
-      if (!search) {
-        total = await prisma.books.count()
-        data = await prisma.books.findMany({
-          include: { Categories: true },
-          take: 13,
-          skip: (page - 1) * 13,
-        })
-      } else {
-        total = await prisma.books.count({
-          where: {
-            OR: [
-              {
-                Title: {
-                  contains: search,
-                },
+      total = await prisma.books.count({
+        where: {
+          OR: [
+            {
+              Title: {
+                contains: search,
               },
-              {
-                Author: {
-                  contains: search,
-                },
+            },
+            {
+              Author: {
+                contains: search,
               },
-            ],
-          },
-        })
-        data = await prisma.books.findMany({
-          where: {
-            OR: [
-              {
-                Title: {
-                  contains: search,
-                },
+            },
+          ],
+        },
+      })
+      data = await prisma.books.findMany({
+        where: {
+          OR: [
+            {
+              Title: {
+                contains: search,
               },
-              {
-                Author: {
-                  contains: search,
-                },
+            },
+            {
+              Author: {
+                contains: search,
               },
-            ],
-          },
-          include: { Categories: true },
-          take: 13,
-          skip: (page - 1) * 13,
-        })
-      }
+            },
+          ],
+        },
+        include: { Categories: true },
+        take: 13,
+        skip: (page - 1) * 13,
+      })
     } else {
-      if (!search) {
-        const allData = await prisma.books.findMany({
-          where: {
-            Categories: {
-              CategoryID: categoryId,
-            },
+      const allData = await prisma.books.findMany({
+        where: {
+          Categories: {
+            CategoryID: categoryId,
           },
-          include: { Categories: { select: { CategoryID: true } } },
-        })
-        total = allData.length
-        data = await prisma.books.findMany({
-          where: {
-            Categories: {
-              CategoryID: categoryId,
+          OR: [
+            {
+              Title: {
+                contains: search,
+              },
             },
-          },
-          take: 13,
-          skip: (page - 1) * 13,
-          include: { Categories: { select: { CategoryID: true } } },
-        })
-      } else {
-        const allData = await prisma.books.findMany({
-          where: {
-            Categories: {
-              CategoryID: categoryId,
+            {
+              Author: {
+                contains: search,
+              },
             },
-            OR: [
-              {
-                Title: {
-                  contains: search,
-                },
-              },
-              {
-                Author: {
-                  contains: search,
-                },
-              },
-            ],
+          ],
+        },
+        include: { Categories: { select: { CategoryID: true } } },
+      })
+      total = allData.length
+      data = await prisma.books.findMany({
+        where: {
+          Categories: {
+            CategoryID: categoryId,
           },
-          include: { Categories: { select: { CategoryID: true } } },
-        })
-        total = allData.length
-        data = await prisma.books.findMany({
-          where: {
-            Categories: {
-              CategoryID: categoryId,
+          OR: [
+            {
+              Title: {
+                contains: search,
+              },
             },
-            OR: [
-              {
-                Title: {
-                  contains: search,
-                },
+            {
+              Author: {
+                contains: search,
               },
-              {
-                Author: {
-                  contains: search,
-                },
-              },
-            ],
-          },
-          take: 13,
-          skip: (page - 1) * 13,
-          include: { Categories: { select: { CategoryID: true } } },
-        })
-      }
+            },
+          ],
+        },
+        take: 13,
+        skip: (page - 1) * 13,
+        include: { Categories: { select: { CategoryID: true } } },
+      })
     }
     reply.code(200).send({
       total,

@@ -5,6 +5,7 @@ type FineRequest = FastifyRequest<{
   Params: {
     fId?: number
     bId?: number
+    rId?: number
   }
   Querystring: {
     page?: number
@@ -36,18 +37,64 @@ export async function getFinesHandler(
   }
 }
 
-// TODO:完成接口
 export async function getFineByReaderIdHandler(
   request: FineRequest,
   reply: FastifyReply
 ) {
   try {
-    const total = await prisma.fines.count({
-      where: {},
+    const readerId = request.params.rId
+    const totalFines = await prisma.fines.findMany({
+      include: {
+        Borrows: {
+          include: {
+            Readers: {
+              select: {
+                ReaderID: true,
+              },
+            },
+            Books: {
+              select: {
+                Title: true,
+              },
+            },
+          },
+        },
+      },
+      where: {
+        Borrows: {
+          Readers: {
+            ReaderID: readerId,
+          },
+        },
+      },
     })
+    const total = totalFines.length
     let { page } = request.query
     if (!page) page = 1
     const fines = await prisma.fines.findMany({
+      include: {
+        Borrows: {
+          include: {
+            Readers: {
+              select: {
+                ReaderID: true,
+              },
+            },
+            Books: {
+              select: {
+                Title: true,
+              },
+            },
+          },
+        },
+      },
+      where: {
+        Borrows: {
+          Readers: {
+            ReaderID: readerId,
+          },
+        },
+      },
       take: 7,
       skip: (page - 1) * 7,
     })

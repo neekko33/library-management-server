@@ -202,7 +202,7 @@ export async function getBorrowsByReadIdHandler(
     const { rId } = request.params
     const total = await prisma.borrows.count({
       where: {
-        // ReaderID: rId,
+        ReaderID: rId,
         ReturnDate: null,
       },
     })
@@ -210,7 +210,7 @@ export async function getBorrowsByReadIdHandler(
     if (!page) page = 1
     const borrows = await prisma.borrows.findMany({
       where: {
-        // ReaderID: rId,
+        ReaderID: rId,
         ReturnDate: null,
       },
       take: 7,
@@ -241,7 +241,7 @@ export async function getBorrowsHistoryByReadIdHandler(
     const { rId } = request.params
     const total = await prisma.borrows.count({
       where: {
-        // ReaderID: rId,
+        ReaderID: rId,
         ReturnDate: {
           not: null,
         },
@@ -251,7 +251,7 @@ export async function getBorrowsHistoryByReadIdHandler(
     if (!page) page = 1
     const borrows = await prisma.borrows.findMany({
       where: {
-        // ReaderID: rId,
+        ReaderID: rId,
         ReturnDate: {
           not: null,
         },
